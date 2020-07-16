@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"net"
 	"path"
+	"path/filepath"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/lum8rjack/GoOut/server/modules/writefile"
@@ -43,7 +45,7 @@ func serve(pc net.PacketConn, addr *net.UDPAddr, buf []byte, udp *udpConf) {
 		//t := strings.TrimSuffix(string(buf), "\n")
 		l := strings.Split(string(buf), ",")
 		t := l[1]
-		udp.filename = t
+		udp.filename = filepath.Base(t)
 		udp.fnLength = len(udp.filename)
 		udp.remoteip = addr.IP.String()
 	} else if string(buf[:4]) == "STOP" {
@@ -59,7 +61,9 @@ func serve(pc net.PacketConn, addr *net.UDPAddr, buf []byte, udp *udpConf) {
 	}
 }
 
-func StartUDP(udp udpConf) {
+func StartUDP(udp udpConf, wg *sync.WaitGroup) {
+
+	defer wg.Done()
 
 	time.Sleep(1 * time.Second)
 

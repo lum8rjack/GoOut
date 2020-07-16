@@ -8,18 +8,18 @@
         "Port": 8080
     },
     "UDP": {
-        "Enabled": true,
+        "Enabled": false,
         "Port": 8888
     },
     "HTTP": {
-        "Enabled": true,
+        "Enabled": false,
         "Port": 8000,
         "Get": "status.html",
         "Post": "upload",
         "Uploadsize": 10
     },
     "HTTPS": {
-        "Enabled": false,
+        "Enabled": true,
         "Port": 8443,
         "Get": "status.html",
         "Post": "upload.php",

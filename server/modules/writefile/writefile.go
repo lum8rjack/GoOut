@@ -51,6 +51,5 @@ func WriteLog(fname string, text string) {
 }
 
 func WriteFile(fname string, data []byte) {
-	//fmt.Println("Writing file to: " + fname)
 	writeData(fname, data)
 }

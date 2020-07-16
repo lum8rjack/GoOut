@@ -28,25 +28,25 @@ func startServers() {
 	if config.TCP.Enabled {
 		wg.Add(1)
 		tcpc := tcp.NewTCP(config.Logging.LogFile, config.Logging.UploadDir, config.TCP.Port)
-		go tcp.StartTCP(tcpc)
+		go tcp.StartTCP(tcpc, &wg)
 	}
 
 	if config.UDP.Enabled {
 		wg.Add(1)
 		udpc := udp.NewUDP(config.Logging.LogFile, config.Logging.UploadDir, config.UDP.Port)
-		go udp.StartUDP(udpc)
+		go udp.StartUDP(udpc, &wg)
 	}
 
 	if config.HTTP.Enabled {
 		wg.Add(1)
 		httpc := http.NewHTTP(config.Logging.LogFile, config.Logging.UploadDir, config.HTTP.Port, config.HTTP.Get, config.HTTP.Post, config.HTTP.Uploadsize)
-		go http.StartHTTP(httpc)
+		go http.StartHTTP(httpc, &wg)
 	}
 
 	if config.HTTPS.Enabled {
 		wg.Add(1)
 		httpsc := https.NewHTTPS(config.Logging.LogFile, config.Logging.UploadDir, config.HTTPS.Port, config.HTTPS.Get, config.HTTPS.Post, config.HTTPS.Uploadsize, config.HTTPS.Certificate, config.HTTPS.Key)
-		go https.StartHTTPS(httpsc)
+		go https.StartHTTPS(httpsc, &wg)
 	}
 
 }

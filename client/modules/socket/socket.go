@@ -6,6 +6,7 @@ import (
 	"io"
 	"net"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 )
@@ -82,11 +83,11 @@ func SocketRun(data []string, file string) {
 	}
 	defer f.Close()
 
-	fmt.Printf("Sending file: %v (%d bytes)\n", file, FILESIZE)
+	fmt.Printf("Sending file: %v (%d bytes)\n", filepath.Base(file), FILESIZE)
 
 	sendBuffer := make([]byte, SOCKETBUFFER)
-	start := []byte(fillString("START,"+file+",N", 64))
-	stop := []byte("STOP," + file + "\n")
+	start := []byte(fillString("START,"+filepath.Base(file)+",N", 64))
+	stop := []byte("STOP," + filepath.Base(file) + "\n")
 	s := 0
 	if method == "udp" {
 		// Milliseconds

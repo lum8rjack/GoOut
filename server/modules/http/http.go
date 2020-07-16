@@ -7,7 +7,9 @@ import (
 	"net"
 	"net/http"
 	"path"
+	"path/filepath"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/lum8rjack/GoOut/server/modules/writefile"
@@ -57,17 +59,14 @@ func servePage(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		filename := keys[0]
+		filename := filepath.Base(keys[0])
 
-		//fmt.Fprintf(w, "Filename = %s\n", filename)
-		//fmt.Fprintf(w, "Data = %s\n", data)
 		uDec, _ := b64.URLEncoding.DecodeString(data)
 		writefile.WriteFile(path.Join(hc.fileDir, filename), uDec)
-		//http.ServeFile(w, r, "config/http/index.html")
 
 	} else if r.URL.Path == "/"+hc.post && r.Method == "GET" {
 		http.ServeFile(w, r, "config/http/post.html")
-	} else if r.URL.Path == "/upload" && r.Method == "POST" {
+	} else if (r.URL.Path == "/upload" || r.URL.Path == "/"+hc.post) && r.Method == "POST" {
 		// Parse our multipart form, 10 << 20 specifies a maximum
 		// upload of 10 MB files.
 		r.Body = http.MaxBytesReader(w, r.Body, hc.uploadsize<<20)
@@ -80,14 +79,12 @@ func servePage(w http.ResponseWriter, r *http.Request) {
 		}
 		defer file.Close()
 
-		//s := strconv.FormatInt(handler.Size, 10)
-
 		fileBytes, err := ioutil.ReadAll(file)
 		if err != nil {
 			fmt.Println(err)
 		}
 		// write this byte array to to Uploads directory
-		writefile.WriteFile(path.Join(hc.fileDir, handler.Filename), fileBytes)
+		writefile.WriteFile(path.Join(hc.fileDir, filepath.Base(handler.Filename)), fileBytes)
 
 		ip, _, err := net.SplitHostPort(r.RemoteAddr)
 		if err != nil {
@@ -103,7 +100,9 @@ func servePage(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func StartHTTP(httpc httpConf) {
+func StartHTTP(httpc httpConf, wg *sync.WaitGroup) {
+
+	defer wg.Done()
 
 	hc = httpc
 	time.Sleep(1 * time.Second)

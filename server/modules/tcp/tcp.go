@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"net"
 	"path"
+	"path/filepath"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/lum8rjack/GoOut/server/modules/writefile"
@@ -47,7 +49,7 @@ func handleConnection(c net.Conn, tcp *tcpConf) {
 	if string(start[:5]) == "START" {
 		// START,filename.txt,N
 		t := strings.Split(string(start), "\n")
-		tcp.filename = strings.Split(t[0], ",")[1]
+		tcp.filename = filepath.Base(strings.Split(t[0], ",")[1])
 		tcp.fnLength = len(tcp.filename)
 
 		buf := make([]byte, tcp.buffer)
@@ -71,7 +73,9 @@ func handleConnection(c net.Conn, tcp *tcpConf) {
 	}
 }
 
-func StartTCP(tcp tcpConf) {
+func StartTCP(tcp tcpConf, wg *sync.WaitGroup) {
+
+	defer wg.Done()
 
 	time.Sleep(1 * time.Second)
 
