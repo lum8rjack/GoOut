@@ -6,7 +6,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/lum8rjack/client/GoOut/modules"
+	"github.com/lum8rjack/GoOut/client/modules/http"
+	"github.com/lum8rjack/GoOut/client/modules/icmp"
+	"github.com/lum8rjack/GoOut/client/modules/socket"
 )
 
 func printLogo() {
@@ -73,12 +75,12 @@ func main() {
 
 	// Make sure a valid module is specified
 	if mod == "http" {
-		modules.HttpRun(data, *file)
+		http.HttpRun(data, *file)
 	} else if mod == "icmp" {
 		fmt.Println("Exfil via ICMP")
-		modules.IcmpRun(data, *file)
+		icmp.IcmpRun(data, *file)
 	} else if mod == "socket" {
-		modules.SocketRun(data, *file)
+		socket.SocketRun(data, *file)
 	} else {
 		fmt.Println("Invalid module specified")
 		flag.Usage()

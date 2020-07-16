@@ -9,39 +9,44 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/lum8rjack/GoOut/server/modules"
+	"github.com/lum8rjack/GoOut/server/modules/http"
+	"github.com/lum8rjack/GoOut/server/modules/https"
+	"github.com/lum8rjack/GoOut/server/modules/loadconfig"
+	"github.com/lum8rjack/GoOut/server/modules/tcp"
+	"github.com/lum8rjack/GoOut/server/modules/udp"
+	"github.com/lum8rjack/GoOut/server/modules/writefile"
 )
 
 var (
-	version = "0.1"
+	version = "1.0"
 	wg      sync.WaitGroup
-	config  modules.Configuration
+	config  loadconfig.Configuration
 )
 
 func startServers() {
 
 	if config.TCP.Enabled {
 		wg.Add(1)
-		tcp := modules.NewTCP(config.Logging.LogFile, config.Logging.UploadDir, config.TCP.Port)
-		go modules.StartTCP(tcp)
+		tcpc := tcp.NewTCP(config.Logging.LogFile, config.Logging.UploadDir, config.TCP.Port)
+		go tcp.StartTCP(tcpc)
 	}
 
 	if config.UDP.Enabled {
 		wg.Add(1)
-		udp := modules.NewUDP(config.Logging.LogFile, config.Logging.UploadDir, config.UDP.Port)
-		go modules.StartUDP(udp)
+		udpc := udp.NewUDP(config.Logging.LogFile, config.Logging.UploadDir, config.UDP.Port)
+		go udp.StartUDP(udpc)
 	}
 
 	if config.HTTP.Enabled {
 		wg.Add(1)
-		http := modules.NewHTTP(config.Logging.LogFile, config.Logging.UploadDir, config.HTTP.Port, config.HTTP.Get, config.HTTP.Post, config.HTTP.Uploadsize)
-		go modules.StartHTTP(http)
+		httpc := http.NewHTTP(config.Logging.LogFile, config.Logging.UploadDir, config.HTTP.Port, config.HTTP.Get, config.HTTP.Post, config.HTTP.Uploadsize)
+		go http.StartHTTP(httpc)
 	}
 
 	if config.HTTPS.Enabled {
 		wg.Add(1)
-		https := modules.NewHTTPS(config.Logging.LogFile, config.Logging.UploadDir, config.HTTPS.Port, config.HTTPS.Get, config.HTTPS.Post, config.HTTPS.Uploadsize, config.HTTPS.Certificate, config.HTTPS.Key)
-		go modules.StartHTTPS(https)
+		httpsc := https.NewHTTPS(config.Logging.LogFile, config.Logging.UploadDir, config.HTTPS.Port, config.HTTPS.Get, config.HTTPS.Post, config.HTTPS.Uploadsize, config.HTTPS.Certificate, config.HTTPS.Key)
+		go https.StartHTTPS(httpsc)
 	}
 
 }
@@ -63,7 +68,7 @@ func SetupCloseHandler() {
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-c
-		modules.WriteLog(config.Logging.LogFile, "Stopped GoOutServer")
+		writefile.WriteLog(config.Logging.LogFile, "Stopped GoOutServer")
 		os.Exit(0)
 	}()
 }
@@ -83,13 +88,13 @@ func main() {
 	}
 
 	var err error
-	config, err = modules.LoadConf(configFile)
+	config, err = loadconfig.LoadConf(configFile)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 	time.Sleep(1 * time.Second)
-	modules.WriteLog(config.Logging.LogFile, "Starting GoOutServer")
+	writefile.WriteLog(config.Logging.LogFile, "Starting GoOutServer")
 	startServers()
 
 	wg.Wait()
