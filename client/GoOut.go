@@ -22,7 +22,7 @@ func usage() {
 	flag.PrintDefaults()
 	fmt.Println("\nEach module is different but should be created similar to the following:")
 	fmt.Println("\tWEB\tUploads file via http(s) POST or multiple GET requests [module,method,host]")
-	fmt.Println("\t\tEx. web,get,http://example.com:8080/status")
+	fmt.Println("\t\tEx. web,get,http://192.168.1.1:8080/status")
 	fmt.Println("\t\tEx. web,post,https://192.168.1.1/upload")
 	fmt.Println("\n\tSocket\tUploads file via raw TCP or UDP packets [module,method,host:port]")
 	fmt.Println("\t\tEx. socket,tcp,192.168.1.1:8080")
