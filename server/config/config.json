@@ -8,29 +8,23 @@
         "Port": 8080
     },
     "UDP": {
-        "Enabled": false,
+        "Enabled": true,
         "Port": 8888
     },
     "HTTP": {
-        "Enabled": false,
-        "Port": 8000,
+        "Enabled": true,
+        "Port": 80,
         "Get": "status.html",
         "Post": "upload",
         "Uploadsize": 10
     },
     "HTTPS": {
-        "Enabled": true,
+        "Enabled": false,
         "Port": 8443,
         "Get": "status.html",
         "Post": "upload.php",
         "Uploadsize": 10,
         "Certificate": "config/https-server.crt",
         "Key": "config/https-server.key"
-    },
-    "ICMP": {
-        "Enabled": false
-    },
-    "DNS": {
-        "Enabled": false
     }
 }
