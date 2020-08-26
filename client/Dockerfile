@@ -10,13 +10,13 @@ ADD . /app/
 WORKDIR /app
 
 # Build for Linux
-CMD env GOOS=linux GOARCH=amd64 go build -o compiled/GoOut-Linux64 && chmod 777 compiled/*
+CMD env GOOS=linux GOARCH=amd64 go build -ldflags "-s -w" -trimpath -o compiled/GoOut-Linux64 && chmod 777 compiled/*
 
 # Build for Windows
-#CMD env GOOS=windows GOARCH=amd64 go build -o build/GoOut-Windows64.exe && chmod 777 compiled/*
+#CMD env GOOS=windows GOARCH=amd64 go build -ldflags "-s -w" -trimpath -o build/GoOut-Windows64.exe && chmod 777 compiled/*
 
 # Build for Mac
-#CMD env GOOS=darwin GOARCH=amd64 go build -o build/GoOut-Darwin64 && chmod 777 compiled/*
+#CMD env GOOS=darwin GOARCH=amd64 go build -ldflags "-s -w" -trimpath -o build/GoOut-Darwin64 && chmod 777 compiled/*
 
 # Build for Arm
-#CMD env GOOS=linux GOARCH=arm go build -o build/GoOut-LinuxArm && chmod 777 compiled/*
+#CMD env GOOS=linux GOARCH=arm go build -ldflags "-s -w" -trimpath -o build/GoOut-LinuxArm && chmod 777 compiled/*
